@@ -1,0 +1,8 @@
+---
+- name: Install Hashi-Vault
+  hosts: all
+  become: true
+  gather_facts: false
+
+  roles:
+    - create_vault

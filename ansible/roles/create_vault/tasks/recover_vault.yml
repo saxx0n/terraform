@@ -1,0 +1,21 @@
+---
+- name: Set most recent backup
+  ansible.builtin.set_fact:
+    backup_file: "{{ backup_files.files | sort(attribute='mtime',reverse=true) | first }}"
+
+- name: Let user know recover date
+  ansible.builtin.debug:
+    msg: "Recovering backup: {{ backup_file.path }}"
+
+- name: Extract remote backup
+  ansible.builtin.unarchive:
+    src: "{{ backup_file.path }}"
+    dest: /
+    remote_src: true
+  notify: Restart Vault
+
+- name: Deploy Vault config
+  ansible.builtin.copy:
+    src: vault.hcl
+    dest: /etc/vault.d/vault.hcl
+  notify: Restart Vault

@@ -1,0 +1,8 @@
+---
+- name: Configure Proxy
+  hosts: all
+  become: true
+  gather_facts: false
+
+  roles:
+    - create_proxy

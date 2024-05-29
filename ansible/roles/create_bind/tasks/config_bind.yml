@@ -1,0 +1,76 @@
+---
+- name: Set folder permission
+  ansible.builtin.file:
+    path: /etc/bind
+    state: directory
+    owner: root
+    group: bind
+    mode: 0774
+  notify: Restart Bind
+
+- name: Deploy main config
+  ansible.builtin.copy:
+    src: named.conf.local
+    dest: /etc/bind/named.conf.local
+    owner: bind
+    group: bind
+    mode: 0644
+  notify: Restart Bind
+
+- name: Deploy options
+  ansible.builtin.copy:
+    src: named.conf.options
+    dest: /etc/bind/named.conf.options
+    owner: bind
+    group: bind
+    mode: 0644
+  notify: Restart Bind
+
+- name: Create PTR folder
+  ansible.builtin.file:
+    path: /etc/bind/ptr
+    state: directory
+    owner: bind
+    group: bind
+    mode: 0755
+  notify: Restart Bind
+
+- name: Deploy PTR files
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/etc/bind/ptr/{{ item }}"
+    owner: bind
+    group: bind
+    mode: 0644
+  loop:
+    - 10.0.65.db
+    - 10.0.95.db
+    - 10.0.105.db
+    - 10.0.135.db
+    - 10.0.145.db
+    - 10.0.215.db
+  notify: Restart Bind
+
+- name: Deploy main zone file
+  ansible.builtin.copy:
+    src: example.com.db
+    dest: /etc/bind/example.com.db
+    owner: bind
+    group: bind
+    mode: 0644
+  notify: Restart Bind
+
+- name: Deploy RNDC key
+  ansible.builtin.copy:
+    src: rndc.key
+    dest: /etc/bind/rndc.key
+    owner: bind
+    group: bind
+    mode: 0644
+  notify: Restart Bind
+
+- name: Deploy IPv6 fixes
+  ansible.builtin.lineinfile:
+    path: /etc/default/named
+    regex: "OPTIONS="
+    line: 'OPTIONS="-u bind -4"'

@@ -1,0 +1,12 @@
+---
+- name: Restart Vault
+  ansible.builtin.systemd:
+    name: vault
+    state: restarted
+    enabled: true
+  notify: Unlock Vault
+
+- name: Unlock Vault
+  ansible.builtin.command: "vault operator unseal '{{ vault_key }}'"
+  environment:
+    VAULT_ADDR: https://vault.example.com:8200

@@ -1,0 +1,9 @@
+---
+- name: Deploy file change to apparmor
+  ansible.builtin.lineinfile:
+    path: /etc/apparmor.d/local/usr.sbin.named
+    line: /etc/bind/** rw,
+
+- name: Apply AppArmor profile
+  ansible.builtin.command: apparmor_parser -r /etc/apparmor.d/usr.sbin.named
+  notify: Restart Bind

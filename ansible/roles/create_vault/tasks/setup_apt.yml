@@ -1,0 +1,20 @@
+---
+- name: Get Hashi GPG Key
+  ansible.builtin.get_url:
+    url: https://apt.releases.hashicorp.com/gpg
+    dest: /tmp/gpgkey
+
+- name: De-Armor GPG Key
+  ansible.builtin.shell: cat /tmp/gpgkey | gpg --dearmor > /usr/share/keyrings/hashicorp-archive-keyring.gpg
+  args:
+    creates: /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+- name: Add Hashi Repo
+  ansible.builtin.apt_repository:
+    repo: deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main
+
+- name: Install Hashi-Vault
+  ansible.builtin.apt:
+    name:
+      - vault
+    update_cache: true

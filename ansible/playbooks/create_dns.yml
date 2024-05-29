@@ -1,0 +1,8 @@
+---
+- name: Install Bind
+  hosts: all
+  become: true
+  gather_facts: false
+
+  roles:
+    - create_bind

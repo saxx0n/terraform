@@ -1,0 +1,22 @@
+---
+# This is a TERRIBLE IDEA!  DO NOT DO THIS
+- name: Setup Auto-Unlock
+  ansible.builtin.cron:
+    name: "Unlock Vault"
+    special_time: reboot
+    job: "sleep 30 && VAULT_ADDR='https://vault.example.com:8200' vault operator unseal '{{ vault_key }}='"
+
+- name: Deploy backup script
+  ansible.builtin.template:
+    src: backup_vault.sh.j2
+    dest: /usr/local/bin/backup_vault.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Setup nightly backups
+  ansible.builtin.cron:
+    name: "Backup Vault"
+    hour: 1
+    minute: 0
+    job: /usr/local/bin/backup_vault.sh > /tmp/cron-out

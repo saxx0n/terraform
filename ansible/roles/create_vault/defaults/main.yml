@@ -1,0 +1,10 @@
+---
+error_ok: true
+
+mount_options: defaults
+mount_path: /mnt/nfs/vault
+
+nfs_server: 10.0.215.142
+nfs_path: /mnt/Rory/Services/Vault
+
+vault_key: CHANGEME

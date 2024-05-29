@@ -1,0 +1,12 @@
+;
+; Zone file for 135.0.10.in-addr.arpa.
+;
+$TTL 1D
+@       IN      SOA     dns-node1.example.com. dns-admin.example.com. (
+                        2024022601      ; serial
+                        8H              ; refresh
+                        2H              ; retry
+                        4W              ; expire
+                        1D )            ; minimum
+
+@               IN      NS      dns-node1.example.com.

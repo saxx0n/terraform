@@ -1,0 +1,44 @@
+---
+- name: Setup Firewall (Debian)
+  when: ansible_os_family == "Debian"
+  block:
+    - name: Add DNS Firewall Access
+      community.general.ufw:
+        port: 53
+        proto: udp
+        rule: allow
+        state: enabled
+
+    - name: Add HTTP(s) Firewall Access
+      community.general.ufw:
+        port: "{{ port }}"
+        proto: tcp
+        rule: allow
+        state: enabled
+      with_items:
+        - 80
+        - 443
+      loop_control:
+        loop_var: port
+
+- name: Setup Firewall (RedHat)
+  when: ansible_os_family == "RedHat"
+  block:
+    - name: Add DNS Firewall Access
+      ansible.posix.firewalld:
+        service: bind
+        permanent: true
+        immediate: true
+        state: enabled
+
+    - name: Add HTTP(s) Firewall Access
+      ansible.posix.firewalld:
+        service: "{{ service }}"
+        permanent: true
+        immediate: true
+        state: enabled
+      with_items:
+        - http
+        - https
+      loop_control:
+        loop_var: service

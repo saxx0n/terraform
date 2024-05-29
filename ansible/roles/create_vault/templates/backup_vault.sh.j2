@@ -1,0 +1,10 @@
+#!/bin/bash -x
+
+if [ "$(mount | grep -c {{ mount_path }})" == 1 ] ; then
+  tar czf "{{ mount_path }}/$(date +%m_%d_%Y)_vault_backup.tgz" /opt/vault
+
+  find {{ mount_path }} -type f -mtime +30 -delete
+else
+  echo 'Backup filesystem is not mounted'
+  exit 1
+fi

@@ -1,0 +1,35 @@
+---
+- name: Clear proxy
+  ansible.builtin.file:
+    path: /etc/apt/apt.conf.d/90curtin-aptproxy
+    state: absent
+
+- name: Clear env
+  ansible.builtin.copy:
+    src: environment
+    dest: /etc/environment
+
+- name: Install squid
+  ansible.builtin.apt:
+    name:
+      - squid
+    clean: true
+    update_cache: true
+
+- name: Deploy basic squid config
+  ansible.builtin.copy:
+    src: squid.conf
+    dest: /etc/squid/squid.conf
+
+- name: Start squid
+  ansible.builtin.systemd:
+    name: squid
+    state: restarted
+    enabled: true
+
+- name: Add Squid firewall access
+  community.general.ufw:
+    port: 3128
+    proto: tcp
+    rule: allow
+    state: enabled

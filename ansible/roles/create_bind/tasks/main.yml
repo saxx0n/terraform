@@ -1,0 +1,27 @@
+---
+- name: Install Bind
+  ansible.builtin.apt:
+    name:
+      - bind9
+
+- name: Deploy Config
+  ansible.builtin.include_tasks: config_bind.yml
+
+- name: Setup AppArmor
+  ansible.builtin.include_tasks: setup_apparmor.yml
+
+- name: Start bind
+  ansible.builtin.systemd:
+    name: bind9
+    state: restarted
+    enabled: true
+
+- name: Add DNS firewall access (Debian)
+  community.general.ufw:
+    port: 53
+    proto: "{{ item }}"
+    rule: allow
+    state: enabled
+  loop:
+    - tcp
+    - udp

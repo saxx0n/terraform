@@ -1,0 +1,34 @@
+---
+- name: Gather Data
+  ansible.builtin.setup:
+    gather_subset:
+      - os_family
+
+- name: Setup Vault pre-reqs
+  ansible.builtin.apt:
+    name:
+      - gpg
+      - wget
+
+- name: Setup APT
+  ansible.builtin.include_tasks: setup_apt.yml
+
+- name: Setup NFS
+  ansible.builtin.include_tasks: setup_nfs.yml
+
+- name: Check if backup folder is populated
+  ansible.builtin.find:
+    paths: "{{ mount_path }}"
+  register: backup_files
+
+- name: Trigger Vault Recovery
+  ansible.builtin.include_tasks: recover_vault.yml
+  when: backup_files.matched > 0
+
+# Add setup for new vault here
+
+- name: Setup cron-jobs
+  ansible.builtin.include_tasks: setup_cron.yml
+
+- name: Setup firewall
+  ansible.builtin.include_tasks: setup_firewall.yml

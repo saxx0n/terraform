@@ -1,0 +1,34 @@
+;
+; Zone file for example.com
+;
+$TTL 1H
+@       IN      SOA     dns-node1.example.com. dns-admin.example.com. (
+                        2024022601      ; serial
+                        8H              ; refresh
+                        2H              ; retry
+                        4W              ; expire
+                        1D )            ; minimum
+
+                NS      dns-node1
+
+dns-node1       IN  A       10.0.105.21
+
+esx1            IN  A       10.0.65.101
+esx1-storage    IN  A       10.0.215.101
+esx2            IN  A       10.0.65.102
+esx2-storage    IN  A       10.0.215.102
+esx3            IN  A       10.0.65.103
+esx3-storage    IN  A       10.0.215.103
+
+normandy        IN  A       10.0.215.142
+
+pi-hole1        IN  A       10.0.105.18
+proxy           IN  A       10.0.105.10
+
+vcenter         IN  A       10.0.65.2
+
+example.com.      IN  MX      1   aspmx.l.google.com.
+example.com.      IN  MX      10  alt3.aspmx.l.google.com.
+example.com.      IN  MX      10  alt4.aspmx.l.google.com.
+example.com.      IN  MX      5   alt1.aspmx.l.google.com.
+example.com.      IN  MX      5   alt2.aspmx.l.google.com.
