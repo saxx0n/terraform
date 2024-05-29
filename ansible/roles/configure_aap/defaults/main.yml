@@ -1,0 +1,7 @@
+---
+tower_host: "tower.example.com"
+tower_user: "admin"
+tower_pass: "CHANGEME"
+
+vault_url: https://vault.example.com:8200
+vault_token: CHANGEME

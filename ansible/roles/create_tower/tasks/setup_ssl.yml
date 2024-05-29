@@ -1,0 +1,15 @@
+- name: Deploy Bundle SSL Cert
+  ansible.builtin.copy:
+    content: "{{ lookup('hashi_vault', 'secret=kv-v1/certs/wild:bundle_cert', url=vault_server, token=vault_token) }}"
+    dest: "/etc/pki/tls/certs/wild.pem"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Deploy SSL Key
+  ansible.builtin.copy:
+    content: "{{ lookup('hashi_vault', 'secret=kv-v1/certs/wild:key', url=vault_server, token=vault_token) }}"
+    dest: "/etc/pki/tls/private/wild.key"
+    owner: root
+    group: root
+    mode: 0600

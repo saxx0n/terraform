@@ -1,0 +1,13 @@
+---
+- name: Install NFS client
+  ansible.builtin.dnf:
+    name: nfs-utils
+
+- name: Mount NFS share
+  ansible.posix.mount:
+    path: "{{ mount_path }}"
+    src: "{{ nfs_server }}:{{ nfs_path }}"
+    fstype: nfs
+    opts: "{{ mount_options }}"
+    state: mounted
+  ignore_errors: "{{ error_ok }}"

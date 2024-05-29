@@ -1,0 +1,25 @@
+---
+- name: Find the correct disk
+  ansible.builtin.set_fact:
+    pvs: "/dev/{{ disk_item.key }}"
+  when:
+    - not disk_item.value.partitions
+    - not disk_item.value.holders
+#    - not disk_item.value.links.ids
+    - disk_item.key is search ("sd")
+    - disk_item.value.size == disk_size_combined
+  with_dict: "{{ ansible_devices }}"
+  loop_control:
+    loop_var: disk_item
+    label: "{{ disk_item.key }} / {{ disk_item.value.size }}"
+
+- name: Unable to find the disk
+  ansible.builtin.fail:
+    msg: Unable to find a disk that meets the size requirements and is not already in use
+  when:
+    - pvs is undefined
+
+- name: Create VG
+  community.general.lvg:
+    vg: "{{ vg_name }}"
+    pvs: "{{ pvs }}"

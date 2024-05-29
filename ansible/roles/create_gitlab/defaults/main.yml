@@ -1,0 +1,8 @@
+---
+error_ok: true
+
+mount_options: defaults
+mount_path: /mnt/nfs/gitlab
+
+nfs_server: 10.0.215.142
+nfs_path: /mnt/Rory/Services/GitLab

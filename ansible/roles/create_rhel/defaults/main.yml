@@ -1,0 +1,5 @@
+---
+direction: present
+
+rhel_pass: CHANGEME
+rhel_user: CHANGE@ME.COM

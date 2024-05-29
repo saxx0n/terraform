@@ -1,0 +1,32 @@
+---
+- name: Create LV
+  when: ansible_lvm['lvs'][lv_name.name] is not defined
+  block:
+    - name: "Create a new LV {{ lv_name.name }}"
+      community.general.lvol:
+        vg: "{{ vg_name }}"
+        lv: "{{ lv_name.name }}"
+        size: "{{ lv_name.size }}"
+
+    - name: "Format the LV {{ lv_name.name }}"
+      community.general.filesystem:
+        fstype: "{{ lv_name.fs | default('xfs') }}"
+        dev: "/dev/{{ vg_name }}/{{ lv_name.name }}"
+        # noqa args[module]
+
+    - name: "Mount the LV {{ lv_name.name }}"
+      ansible.posix.mount:
+        path: "{{ lv_name.path }}"
+        src: "/dev/{{ vg_name }}/{{ lv_name.name }}"
+        fstype: "{{ lv_name.fs | default('xfs') }}"
+        opts: "{{ lv_name.options | default('defaults') }}"
+        state: mounted
+
+    - name: "Set ownership on LV {{ lv_name.name }}"
+      ansible.builtin.file:
+        path: "{{ lv_name.path }}"
+        state: directory
+        owner: "{{ lv_name.owner | default('root') }}"
+        group: "{{ lv_name.group | default('root') }}"
+        mode: "{{ lv_name.perm | default('0644') }}"
+      when: lv_name.owner is defined or lv_name.perm is defined

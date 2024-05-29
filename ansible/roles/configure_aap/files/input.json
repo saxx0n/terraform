@@ -1,0 +1,21 @@
+{
+    "fields": [
+     {
+      "id": "url",
+      "type": "string",
+      "label": "Vault Address",
+      "secret": false
+     },
+     {
+      "id": "token",
+      "type": "string",
+      "label": "Access Token",
+      "secret": true
+     }
+    ],
+    "required": [
+     "url",
+     "token"
+    ]
+   }
+   

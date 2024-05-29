@@ -1,0 +1,40 @@
+- name: Create/Deploy SSH Keys
+  hosts: all
+  become: true
+  gather_facts: false
+
+  roles:
+    - create_root_key
+
+- name: Resize Filesystems
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Resize /var
+      community.general.lvol:
+        vg: vg00
+        lv: tmp
+        size: 3G
+        resizefs: true
+
+    - name: Configure LV
+      ansible.builtin.include_role:
+        name: setup_vg
+      vars:
+        vg_size: 64
+        vg_name: vg01
+        mount_points:
+          - name: awx
+            path: '/var/lib/awx'
+            size: 60G
+            perm: 777
+
+- name: Install Tower
+  hosts: aap-ctrl
+  become: true
+  gather_facts: false
+
+  roles:
+    - create_tower

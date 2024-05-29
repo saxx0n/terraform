@@ -1,0 +1,24 @@
+---
+- name: Create projects
+  ansible.controller.project:
+    allow_override: "{{ project.override | default(true) }}"
+    description: "{{ project.desc | default('') }}"
+    name: "{{ project.name }}"
+    organization: Example
+    scm_branch: master
+    scm_credential: GitLab (Vault)
+    scm_type: git
+    scm_update_cache_timeout: "{{ project.timeout | default(120) }}"
+    scm_update_on_launch: true
+    scm_url: "{{ project.url }}"
+    state: "{{ project.state | default('present') }}"
+  with_items:
+    - name: src-inventory
+      description: src-inventory
+      url: https://gitlab.Example.org/automation/ansible/inventory.git
+      timeout: 0
+    - name: src-playbooks
+      url: https://gitlab.Example.org/automation/ansible/playbooks.git
+  loop_control:
+    loop_var: project
+    label: "{{ project.name }}"

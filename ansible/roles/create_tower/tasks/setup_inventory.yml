@@ -1,0 +1,43 @@
+---
+- name: Create Auotmation Controller Section
+  ansible.builtin.lineinfile:
+    path: "/root/ansible-automation-platform-setup-bundle-{{ tower_major_version }}-{{ tower_minor_version }}-x86_64/inventory"
+    regexp: '\[automationcontroller\]'
+    line: |
+      [automationcontroller]
+      aap-ctrl
+
+- name: Create Execution nodes Section
+  ansible.builtin.lineinfile:
+    path: "/root/ansible-automation-platform-setup-bundle-{{ tower_major_version }}-{{ tower_minor_version }}-x86_64/inventory"
+    regexp: '\[execution_nodes\]'
+    line: |
+      [execution_nodes]
+      aap-work1
+      aap-work2
+
+- name: Setup Password
+  ansible.builtin.lineinfile:
+    path: "/root/ansible-automation-platform-setup-bundle-{{ tower_major_version }}-{{ tower_minor_version }}-x86_64/inventory"
+    regexp: "^{{ item.search }}"
+    line: "{{ item.search }}'{{ item.key }}'"
+  loop:
+    - search: admin_password=
+      key: "{{ tower_password }}"
+    - search: pg_password=
+      key: "{{ pg_password }}"
+  loop_control:
+    label: "{{ item.search }}"
+
+- name: Setup SSL
+  ansible.builtin.lineinfile:
+    path: "/root/ansible-automation-platform-setup-bundle-{{ tower_major_version }}-{{ tower_minor_version }}-x86_64/inventory"
+    regexp: "{{ item.search }}"
+    line: "{{ item.search }}{{ item.key }}"
+  loop:
+    - search: web_server_ssl_cert=
+      key: /etc/pki/tls/certs/wild.pem
+    - search: web_server_ssl_key=
+      key: /etc/pki/tls/private/wild.key
+  loop_control:
+    label: "{{ item.search }}"

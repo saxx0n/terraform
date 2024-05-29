@@ -1,0 +1,7 @@
+---
+- name: Register Server with RHEL
+  community.general.redhat_subscription:
+    username: "{{ rhel_user }}"
+    password: "{{ rhel_pass }}"
+    auto_attach: true
+    state: "{{ direction }}"

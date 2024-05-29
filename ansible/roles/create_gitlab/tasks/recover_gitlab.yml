@@ -1,0 +1,58 @@
+---
+- name: Set most recent backup
+  ansible.builtin.set_fact:
+    backup_file: "{{ backup_files.files | sort(attribute='mtime',reverse=true) | first }}"
+
+- name: Set GitLab version
+  ansible.builtin.set_fact:
+    gitlab_version: "{{ backup_file.path.split('_')[4].split('-')[0] }}"
+
+- name: Let user know recover date
+  ansible.builtin.debug:
+    msg: "Recovering backup: {{ backup_file.path }} GitLab Version: {{ gitlab_version }}"
+
+- name: Install required GitLab version
+  ansible.builtin.apt:
+    name:
+      - "gitlab-ee={{ gitlab_version }}-ee.0"
+    update_cache: true
+
+- name: Find GitLab config
+  ansible.builtin.find:
+    paths: "{{ mount_path }}"
+    patterns: "gitlab_config_*"
+  register: config_files
+
+- name: Set most recent backup
+  ansible.builtin.set_fact:
+    config_file: "{{ config_files.files | sort(attribute='mtime',reverse=true) | first }}"
+
+- name: Let user know recover date
+  ansible.builtin.debug:
+    msg: "Recovering config backup: {{ config_file.path }}"
+
+- name: Recover config backup
+  ansible.builtin.unarchive:
+    src: "{{ config_file.path }}"
+    dest: /
+    remote_src: true
+
+- name: Reconfigure gitlab
+  ansible.builtin.command: gitlab-ctl reconfigure
+
+- name: Stop GitLab services for restore
+  ansible.builtin.command: "gitlab-ctl stop {{ item }}"
+  loop:
+    - puma
+    - sidekiq
+
+- name: Recover Backup
+  ansible.builtin.command: "gitlab-backup restore BACKUP={{ backup_file.path | replace('_gitlab_backup.tar', '') }} force=yes"
+  async: 1200
+  poll: 5
+
+- name: Restart GitLab
+  ansible.builtin.command: gitlab-ctl restart
+
+- name: Fix GitLab secrets
+  ansible.builtin.command: gitlab-rake gitlab:doctor:secrets

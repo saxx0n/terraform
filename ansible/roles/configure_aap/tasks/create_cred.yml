@@ -1,0 +1,76 @@
+---
+- name: Create AAP Cred
+  ansible.controller.credential:
+    name: Tower User
+    organization: Example
+    state: present
+    credential_type: Red Hat Ansible Automation Platform
+    inputs:
+      host: "{{ tower_host }}"
+      username: "{{ tower_user }}"
+      password: "{{ tower_pass }}"
+      verify_ssl: true
+
+- name: Create Hashi-Vault Cred
+  ansible.controller.credential:
+    name: Hashi-Vault
+    organization: Example
+    state: present
+    credential_type: HashiCorp Vault Secret Lookup
+    inputs:
+      url: "{{ vault_url }}"
+      token: "{{ vault_token }}"
+      api_version: v1
+
+- name: Create GitLab Creds
+  ansible.controller.credential:
+    name: GitLab (Vault)
+    organization: Example
+    state: present
+    credential_type: Source Control
+    inputs:
+      username: awx
+
+- name: Link GitLab User to Vault
+  ansible.controller.credential_input_source:
+    input_field_name: password
+    source_credential: Hashi-Vault
+    target_credential: GitLab (Vault)
+    metadata:
+      secret_path: "kv-v1/apps/gitlab"
+      secret_key: "awx"
+
+- name: Create GitLab Registry Creds
+  ansible.controller.credential:
+    name: GitLab Registry (Vault)
+    organization: Example
+    state: present
+    credential_type: Container Registry
+    inputs:
+      host: registry.Example.org
+      username: awx_tower
+
+- name: Link Registry Cred to Vault
+  ansible.controller.credential_input_source:
+    input_field_name: password
+    source_credential: Hashi-Vault
+    target_credential: GitLab Registry (Vault)
+    metadata:
+      secret_path: "kv-v1/apps/gitlab"
+      secret_key: "registry"
+
+- name: Create Hashi-Vault Injection Cred Type
+  ansible.controller.credential_type:
+    name: Vault Injection
+    kind: cloud
+    inputs: "{{ lookup('file', 'input.json') }}"
+    injectors: "{{ lookup('file', 'injector.json') }}"
+
+- name: Create Hashi-Vault (Playbook) Cred
+  ansible.controller.credential:
+    name: Hashi-Vault (Playbook)
+    organization: Example
+    credential_type: Vault Injection
+    inputs:
+      url: "{{ vault_url }}"
+      token: "{{ vault_token }}"

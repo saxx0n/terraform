@@ -1,0 +1,14 @@
+---
+- name: Setup nightly backups
+  ansible.builtin.cron:
+    name: "Backup Gitlab"
+    hour: 2
+    minute: 0
+    job: /usr/bin/gitlab-backup create
+
+- name: Setup nightly config backups
+  ansible.builtin.cron:
+    name: "Backup Gitlab Config"
+    hour: 2
+    minute: 45
+    job: "/usr/bin/gitlab-ctl backup-etc --backup-path {{ mount_path }}"

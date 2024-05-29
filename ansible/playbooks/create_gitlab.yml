@@ -1,0 +1,8 @@
+---
+- name: Install/Configure Gitlab
+  hosts: all
+  gather_facts: false
+  become: true
+
+  roles:
+    - create_gitlab

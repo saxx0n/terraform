@@ -1,0 +1,18 @@
+---
+# NFS options
+error_ok: true
+mount_options: defaults
+mount_path: /mnt/nfs/aap
+
+nfs_server: 10.0.215.142
+nfs_path: /mnt/Rory/Services/AAP
+
+# Tower Options
+pg_password: CHANGEME
+tower_major_version: 2.4
+tower_minor_version: 1
+tower_password: CHANGEME
+
+# SSL Options
+vault_server: https://vault.example.com:8200
+vault_token: change.me

@@ -1,0 +1,18 @@
+---
+- name: Deploy SSL Cert
+  ansible.builtin.include_tasks: setup_ssl.yml
+
+- name: Mount filesystem with AAP Installer
+  ansible.builtin.include_tasks: setup_nfs.yml
+
+- name: Un-archive AAP Installer
+  ansible.builtin.unarchive:
+    src: "/mnt/nfs/aap/ansible-automation-platform-setup-bundle-{{ tower_major_version }}-{{ tower_minor_version }}-x86_64.tar.gz"
+    dest: /root/
+    remote_src: true
+
+- name: Configure Inventory
+  ansible.builtin.include_tasks: setup_inventory.yml
+
+- name: Trigger install
+  ansible.builtin.command: /root/ansible-automation-platform-setup-bundle-{{ tower_major_version }}-{{ tower_minor_version }}-x86_64/setup.sh

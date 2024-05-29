@@ -1,0 +1,6 @@
+---
+- name: Remove default tower stuffs
+  ansible.builtin.include_tasks: decon_tower.yml
+
+- name: Setup Tower
+  ansible.builtin.include_tasks: setup_tower.yml

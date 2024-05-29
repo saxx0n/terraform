@@ -1,0 +1,34 @@
+---
+- name: Delete default tower inventory
+  ansible.controller.inventory:
+    name: Demo Inventory
+    organization: Default
+    state: absent
+  ignore_errors: true # noqa: ignore-errors
+
+- name: Delete default tower project
+  ansible.controller.project:
+    name: Demo Project
+    organization: Default
+    state: absent
+  ignore_errors: true # noqa: ignore-errors
+
+- name: Delete default tower credentials
+  ansible.controller.credential:
+    name: Demo Credential
+    organization:
+    credential_type: Machine
+    state: absent
+
+- name: Delete default tower template
+  ansible.controller.job_template:
+    name: Demo Job Template
+    job_type: run
+    project:
+    playbook:
+    state: absent
+
+- name: Delete default tower organization
+  ansible.controller.organization:
+    name: Default
+    state: absent

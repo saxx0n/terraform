@@ -1,0 +1,14 @@
+---
+- name: Get GitLab GPG Key
+  ansible.builtin.get_url:
+    url: https://packages.gitlab.com/gitlab/gitlab-ee/gpgkey
+    dest: /tmp/gpgkey
+
+- name: De-Armor GPG Key
+  ansible.builtin.shell: cat /tmp/gpgkey | gpg --dearmor > /usr/share/keyrings/gitlab_gitlab-ee-archive-keyring.gpg
+  args:
+    creates: /usr/share/keyrings/gitlab_gitlab-ee-archive-keyring.gpg
+
+- name: Add GitLab Repo
+  ansible.builtin.apt_repository:
+    repo: deb [signed-by=/usr/share/keyrings/gitlab_gitlab-ee-archive-keyring.gpg] https://packages.gitlab.com/gitlab/gitlab-ee/ubuntu/ {{ ansible_distribution_release }} main

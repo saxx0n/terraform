@@ -46,3 +46,27 @@ Also worth noting, just about everything in here has IPv6 hard-coded to off.  If
 ### Add plays for non-recovered vault here... or create an example vault and add it to the playbook....
 - Trigger the build upto and including vault
   - "terraform apply -target vsphere_virtual_machine.vault"
+  - ### Uodate Vault goes here
+- Update ansible/roles/create_gitlab/defaults/main.yml to reflect your reality
+### Add plays for non-recovered gitlab here...
+- Trigger the build upto and including gitlab
+  - "terraform apply -target vsphere_virtual_machine.vault"
+- Update ansible/roles/create_rhel/defaults/main.yml to reflect your reality
+- Update ansible/roles/create_tower/defaults/main.yml to reflect your reality
+  - There are TERRIBLE ideas in this file.  You should NOT use a static tower password, or a static vault token
+  - Note the path to the installer in the 3rd task in ansible/roles/create_tower/tasks/main.yml.  You will NEED to replicate this.  The installer can be downloaded from developer.redhat.com with a free account.
+- Trigger the AAP install
+  - "terraform apply -target null_resource.install_tower"
+- The selenium script I was using to register AAP automatically has stopped working and has been removed.  Right now its back to a manual step.  But at this point, open a web-browser to https://tower.example.com and register your instance.
+- Update ansible/roles/configure_aap/defaults/main.yml to reflect your reality
+  - There are TERRIBLE ideas in this file.  You should NOT use a static tower password, or a static vault token
+
+
+
+
+## How to use (future runs)
+- Trigger the AAP install
+  - "terraform apply -target null_resource.install_tower"
+- The selenium script I was using to register AAP automatically has stopped working and has been removed.  Right now its back to a manual step.  But at this point, open a web-browser to https://tower.example.com and register your instance.
+- Install the rest of the environemnt
+  - "terraform apply"

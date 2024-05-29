@@ -1,0 +1,15 @@
+---
+- name: Create Configure AAP Template
+  ansible.controller.job_template:
+    allow_simultaneous: false
+    ask_variables_on_launch: false
+    become_enabled: false
+    credentials:
+      - Hashi-Vault (Playbook)
+      - Tower User
+    execution_environment: Ziska.Org EE
+    inventory: x64
+    job_type: run
+    name: Configure AAP
+    playbook: playbooks/configure_aap.yml
+    project: src-playbooks

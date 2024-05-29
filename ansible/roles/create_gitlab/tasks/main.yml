@@ -1,0 +1,49 @@
+---
+- name: Gather Data
+  ansible.builtin.setup:
+    gather_subset:
+      - os_family
+
+- name: Exit out on non-ready OS
+  ansible.builtin.assert:
+    that:
+      - ansible_os_family == "Debian"
+    fail_message: "Error, this is only supported on debian currently"
+
+- name: Setup GitLab pre-reqs
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - openssh-server
+      - perl
+      - postfix
+      - tzdata
+
+- name: Setup Partition
+  ansible.builtin.include_tasks: setup_partition.yml
+
+- name: Setup APT
+  ansible.builtin.include_tasks: setup_apt.yml
+
+- name: Setup NFS
+  ansible.builtin.include_tasks: setup_nfs.yml
+
+- name: Check if backup folder is populated
+  ansible.builtin.find:
+    paths: "{{ mount_path }}"
+    patterns: "*ee_gitlab_backup.tar"
+  register: backup_files
+
+- name: Trigger GitLab Recovery
+  ansible.builtin.include_tasks: recover_gitlab.yml
+  when: backup_files.matched > 0
+
+## Build blank gitlab here
+
+- name: Setup cron-jobs
+  ansible.builtin.include_tasks: setup_cron.yml
+
+- name: Setup firewall
+  ansible.builtin.include_tasks: setup_firewall.yml

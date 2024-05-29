@@ -1,0 +1,43 @@
+---
+- name: Create inventories
+  ansible.controller.inventory:
+    description: "{{ inventory.desc | default('') }}"
+    name: "{{ inventory.name }}"
+    organization: Example
+    state: present
+    variables: "{{ inventory.var | default(dict()) }}"
+  with_items:
+    - name: x64
+      desc: x64 Nodes
+      var:
+        enable_firewall: true
+  loop_control:
+    loop_var: inventory
+    label: "{{ inventory.name }}"
+
+- name: Create inventory sources
+  ansible.controller.inventory_source:
+    description: "{{ inventory.desc | default('') }}"
+    inventory: "{{ inventory.inventory }}"
+    name: "{{ inventory.name }}"
+    overwrite: "{{ inventory.overwrite | default(true) }}"
+    overwrite_vars: "{{ inventory.over_vars | default(true) }}"
+    scm_branch: "{{ inventory.branch | default('master') }}"
+    source: scm
+    source_path: "{{ inventory.path }}"
+    source_project: "{{ inventory.project | default('src-inventory') }}"
+    state: "{{ inventory.state | default('present') }}"
+    update_cache_timeout: "{{ inventory.cache_time | default(3600) }}"
+    update_on_launch: "{{ inventory.update_launch | default(true) }}"
+  with_items:
+    - name: K3S Cluster
+      desc: K3S Cluster Nodes
+      inventory: x64
+      path: x64-k3s.yml
+    - name: Non-K3S
+      desc: LXC Containers/Physical Machines/VMs
+      inventory: x64
+      path: x64.yml
+  loop_control:
+    loop_var: inventory
+    label: "{{ inventory.name }}"

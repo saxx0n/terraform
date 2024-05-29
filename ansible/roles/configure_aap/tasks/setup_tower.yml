@@ -1,0 +1,30 @@
+- name: Set Extra Environment Varibles
+  ansible.controller.settings:
+    name: AWX_TASK_ENV
+    value:
+      ANSIBLE_SSH_ARGS: -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+      interpreter_python: auto_silent
+      NO_PROXY: 10.0.0.0/8,.example.com,127.0.0.1,localhost
+
+- name: Create Example organization
+  ansible.controller.organization:
+    name: Example
+    state: present
+    galaxy_credentials:
+      - Ansible Galaxy
+
+- name: Create Credentials
+  ansible.builtin.include_tasks: create_cred.yml
+
+- name: Create EEs
+  ansible.builtin.include_tasks: create_ee.yml
+
+- name: Create Projects
+  ansible.builtin.include_tasks: create_project.yml
+
+- name: Create Inventories
+  ansible.builtin.include_tasks: create_inventory.yml
+
+- name: Create Templates
+  ansible.builtin.include_tasks: create_template.yml
+

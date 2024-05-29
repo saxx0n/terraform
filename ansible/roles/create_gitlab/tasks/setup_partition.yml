@@ -1,0 +1,39 @@
+---
+- name: Extend existing partition to fill all available space
+  community.general.parted:
+    device: /dev/sda
+    number: 3
+    part_end: "100%"
+    label: gpt
+    resize: true
+    state: present
+
+- name: Resize underlying pv
+  ansible.builtin.command: "pvresize /dev/sda3"
+
+- name: Resize /var
+  community.general.lvol:
+    vg: vg00
+    lv: var
+    size: 4G
+    resizefs: true
+
+- name: Create GitLab LV
+  community.general.lvol:
+    vg: vg00
+    lv: gitlab
+    size: 14G
+
+- name: Format the LV
+  community.general.filesystem:
+    fstype: "{{ lv_name.fs | default('xfs') }}"
+    dev: "/dev/vg00/gitlab"
+    # noqa args[module]
+
+- name: Mount the LV
+  ansible.posix.mount:
+    path: "/var/opt/gitlab"
+    src: "/dev/vg00/gitlab"
+    fstype: "{{ lv_name.fs | default('xfs') }}"
+    opts: "{{ lv_name.options | default('defaults') }}"
+    state: mounted

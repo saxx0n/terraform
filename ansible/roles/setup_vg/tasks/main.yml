@@ -1,0 +1,29 @@
+---
+- name: Setup varaible to get around jinga2 errors
+  ansible.builtin.set_fact:
+    disk_size_combined: "{{ vg_size }}.00 GB"
+
+- name: Debug passed variables
+  ansible.builtin.debug:
+    msg: "Looking for disk with a size of {{ disk_size_combined }}"
+
+- name: Setup VG
+  ansible.builtin.include_tasks: create_vg.yml
+  when:
+    - ansible_lvm['vgs'][vg_name] is not defined
+
+- name: Debug more variables
+  ansible.builtin.debug:
+    msg: "Will create LV: {{ item }}"
+  with_items:
+    - "{{ mount_points }}"
+
+- name: Setup LV
+  ansible.builtin.include_tasks: create_lv.yml
+  when:
+    - mount_points is defined
+  with_items:
+    - "{{ mount_points }}"
+  loop_control:
+    loop_var: lv_name
+    label: "{{ lv_name.name }}"

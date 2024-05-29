@@ -1,0 +1,13 @@
+---
+- name: Add HTTP(s) Firewall Access
+  community.general.ufw:
+    port: "{{ item }}"
+    proto: tcp
+    rule: allow
+    state: enabled
+  loop:
+    - 80
+    - 443
+  when: ansible_os_family == "Debian"
+
+
